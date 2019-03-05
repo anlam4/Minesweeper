@@ -32,7 +32,7 @@ public void setBombs(int nBombs)
         int r = (int)(NUM_ROWS*Math.random());
         int c = (int)(NUM_COLS*Math.random());
         if(!bombs.contains(buttons[r][c]))
-            bombs.add(b);
+            bombs.add(new MSButton(r,c));
             nBombs--;
     }
 }
@@ -45,11 +45,13 @@ public void draw ()
 }
 public boolean isWon()  //if unclicked button does not contain a bomb, then not won
 {
-    for(MSButton b : buttons) {
+    for(MSButton[] but : buttons) {
+      for(MSButton b : but) {
         if( !b.isClicked() ) {
             if( !bombs.contains(b) )
                 return false;
-        }        
+        }
+      }
     }    
     return true;
 }
@@ -59,13 +61,13 @@ public void displayLosingMessage()
         bomb.setClicked();
     }
     fill(0, 255, 0);
-    text(32);
+    textSize(32);
     text("You Lose!", 200, 200);
 }
 public void displayWinningMessage()
 {
     fill(0, 0, 255);
-    text(32);
+    textSize(32);
     text("You Win!", 200, 200);
 }
 
@@ -104,6 +106,7 @@ public class MSButton
     }
     public void mousePressed () 
     {
+        int n = countBombs(r,c);
         clicked = true;
         if( mouseButton == RIGHT ) {
             marked = true;              //right-click to mark button
@@ -111,18 +114,18 @@ public class MSButton
         }
         else if( bombs.contains(this) )
             displayLosingMessage();     //if button clicked contains bomb, lose game
-        
-        int n = countBombs(r,c);
         else if(n > 0)                  //if bombs in neighboring buttons, display number
             label += n;
         else {                          //if no bombs in neighboring buttons
-            for(int row = r-1; col <= r+1; col++) {
+            for(int row = r-1; row <= r+1; row++) {
                 for(int col = c-1; col <= c+1; col++) {
                     if( row==r && col==c )  //mousePressed not called for button itself
                         continue;
                     if(isValid(row, col))   //recursively call mousePressed for neighboring buttons
                         buttons[row][col].mousePressed();
-        }
+                }
+            }
+        }    
     }
 
     public void draw () 
