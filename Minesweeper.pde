@@ -131,13 +131,13 @@ public class MSButton
     public void draw () 
     {    
         if (marked)                                 //white if marked (a.k.a flagged)
-            fill(0);
+            fill(255);
         else if( clicked && bombs.contains(this) )  //red if clicked a button with a bomb
             fill(255,0,0);
         else if(clicked)                            //dark grey if clicked a button with no bomb
-            fill( 200 );
+            fill( 150 );
         else                                        //unclicked and unmarked
-            fill( 100 );
+            fill( 200 );
 
         rect(x, y, width, height);
         fill(0);
@@ -149,10 +149,10 @@ public class MSButton
     }
     public boolean isValid(int r, int c)  //checks if row and col numbers exist for 2d array
     {
-        if( r>=0 && r<NUM_ROWS )
+        if( r>=0 && r<NUM_ROWS ) {
+          if( c>=0 && c<NUM_COLS )
             return true;
-        if( c>=0 && c<NUM_COLS )
-            return true;
+        }
         return false;
     }
     public int countBombs(int row, int col)  //counts bombs in neighboring 8 buttons
