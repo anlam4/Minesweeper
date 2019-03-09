@@ -121,7 +121,8 @@ public class MSButton
                 for(int col = c-1; col <= c+1; col++) {
                     if( row==r && col==c )  //mousePressed not called for button itself
                         continue;
-                    if(isValid(row, col))   //recursively call mousePressed for neighboring buttons //add additional statement
+                    //recursively call mousePressed for neighboring buttons
+                    if(isValid(row, col) && !buttons[row][col].isClicked() && !buttons[row][col].isMarked())
                         buttons[row][col].mousePressed();
                 }
             }
