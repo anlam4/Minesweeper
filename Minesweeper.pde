@@ -4,7 +4,6 @@ public final static int NUM_ROWS = 20;
 public final static int NUM_COLS = 20;
 private MSButton[][] buttons;
 private ArrayList <MSButton> bombs;
-private int myBombs = 3;
 
 void setup ()
 {
@@ -23,17 +22,19 @@ void setup ()
     }
    
     bombs = new ArrayList <MSButton>();
-    setBombs(myBombs);
+    setBombs();
 }
-public void setBombs(int nBombs)
+public void setBombs()
 {
     //fills ArrayList with random locations of bombs
+    int nBombs = 10;
     while(nBombs > 0) {
         int r = (int)(NUM_ROWS*Math.random());
         int c = (int)(NUM_COLS*Math.random());
-        if(!bombs.contains(buttons[r][c]))
-            bombs.add(new MSButton(r,c));
+        if(!bombs.contains(buttons[r][c])) {
+            bombs.add(buttons[r][c]);
             nBombs--;
+        }
     }
 }
 
@@ -51,24 +52,29 @@ public boolean isWon()  //if unclicked button does not contain a bomb, then not 
             if( !bombs.contains(b) )
                 return false;
         }
+        else {  //if clicked button does contain a bomb, then not won
+          if( bombs.contains(b) )
+            return false;
+        }
       }
     }    
     return true;
 }
 public void displayLosingMessage()
 {
-    for(MSButton bomb : bombs) {
-        bomb.setClicked();
+    for(MSButton[] but : buttons) {
+      for(MSButton b : but)
+        b.setClicked(true);
     }
-    fill(0, 255, 0);
-    textSize(32);
-    text("You Lose!", 200, 200);
+    String lost = "YOU LOSE!";
+    for(int i = 0; i < lost.length(); i++)
+      buttons[NUM_ROWS/2][(NUM_COLS/2)-4+i].setLabel(lost.substring(i, i+1));
 }
 public void displayWinningMessage()
 {
-    fill(0, 0, 255);
-    textSize(32);
-    text("You Win!", 200, 200);
+    String won = "YOU WIN!";
+    for(int i = 0; i < won.length(); i++)
+      buttons[NUM_ROWS/2][(NUM_COLS/2)-4+i].setLabel(won.substring(i, i+1));
 }
 
 public class MSButton
@@ -100,22 +106,24 @@ public class MSButton
     }
     // called by manager
     
-    public void setClicked()
+    public void setClicked(boolean isClick)
     {
-        clicked = true;
+        clicked = isClick;
     }
     public void mousePressed () 
     {
-        int n = countBombs(r,c);
         clicked = true;
         if( mouseButton == RIGHT ) {
+          if( isMarked() )
+            marked = false;
+          else
             marked = true;              //right-click to mark button
-            clicked = false;
+          clicked = false;
         }
         else if( bombs.contains(this) )
             displayLosingMessage();     //if button clicked contains bomb, lose game
-        else if(n > 0)                  //if bombs in neighboring buttons, display number
-            label += n;
+        else if(countBombs(r,c) > 0)                  //if bombs in neighboring buttons, display number
+            label += countBombs(r,c);
         else {                          //if no bombs in neighboring buttons
             for(int row = r-1; row <= r+1; row++) {
                 for(int col = c-1; col <= c+1; col++) {
@@ -135,10 +143,10 @@ public class MSButton
             fill(255);
         else if( clicked && bombs.contains(this) )  //red if clicked a button with a bomb
             fill(255,0,0);
-        else if(clicked)                            //dark grey if clicked a button with no bomb
-            fill( 150 );
-        else                                        //unclicked and unmarked
+        else if(clicked)                            //light grey if clicked a button with no bomb
             fill( 200 );
+        else                                        //unclicked and unmarked
+            fill( 150 );
 
         rect(x, y, width, height);
         fill(0);
